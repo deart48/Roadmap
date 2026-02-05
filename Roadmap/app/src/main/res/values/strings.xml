@@ -1,0 +1,106 @@
+<resources>
+    <string name="app_name">Roadmap</string>
+    <string name="welcome_title">Добро пожаловать</string>
+    <string name="welcome_subtitle">Пожалуйста, выберите действие</string>
+    <string name="login_button">Вход</string>
+    <string name="register_button">Регистрация</string>
+    <string name="forgot_password">Забыли пароль?</string>
+    
+    <!-- Login Screen -->
+    <string name="login_subtitle">Вход в аккаунт</string>
+    <string name="email_hint">Email</string>
+    <string name="password_label">Пароль</string>
+    <string name="password_hint">Пароль</string>
+    <string name="login_action">Войти</string>
+    <string name="create_account">Создать аккаунт</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Регистрация</string>
+    <string name="register_subtitle">Создайте свой аккаунт</string>
+    <string name="name_hint">Имя</string>
+    <string name="register_action">Зарегистрироваться</string>
+    <string name="already_have_account">Уже есть аккаунт?\nВойти</string>
+
+    <!-- Home Screen -->
+    <string name="search_hint">Поиск профессий</string>
+    <string name="suggested_roadmaps">Возможно вам подойдет</string>
+    <string name="favorite_roadmaps">Избранные дорожные карты</string>
+    
+    <!-- Card Titles -->
+    <string name="web_dev">Веб-разработчик</string>
+    <string name="graphic_designer">Графический\nдизайнер</string>
+    <string name="data_analyst">Аналитик\nданных</string>
+    <string name="product_manager">Продукт-\nменеджер</string>
+    <string name="marketing">Маркетинг</string>
+    <string name="finance">Финансы</string>
+
+    <!-- Card Details -->
+    <string name="steps_10">10 этапов</string>
+    <string name="steps_8">8 этапов</string>
+    <string name="steps_12">12 этапов</string>
+    <string name="steps_9">9 этапов</string>
+    <string name="favorite_label">Избранное</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_catalog">Каталог</string>
+    <string name="nav_roadmap">Roadmap</string>
+    <string name="nav_profile">Профиль</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_name">Иван Иванов</string>
+    <string name="profile_role">Junior Developer</string>
+    <string name="current_progress_title">Текущий прогресс</string>
+    <string name="frontend_roadmap">Frontend Roadmap</string>
+    <string name="progress_percent">65%</string>
+    <string name="next_step">Следующий шаг: React</string>
+    <string name="favorite_maps_title">Избранные карты</string>
+    <string name="ux_ui_designer">UX/UI\nDesigner</string>
+    <string name="python_backend">Python\nBackend</string>
+
+    <!-- Roadmap Screen -->
+    <string name="continue_button">Продолжить</string>
+    <string name="html_css_basics">HTML &amp; CSS\nBasics</string>
+
+    <!-- Catalog Screen -->
+    <string name="search_catalog_hint">Поиск дорожных карт</string>
+    <string name="tab_list">Список</string>
+    <string name="tab_group">Группа</string>
+    
+    <!-- Catalog List Items -->
+    <string name="cat_web_dev_title">Веб-разработка</string>
+    <string name="cat_web_dev_desc">Frontend, Backend, Fullstack.</string>
+    <string name="cat_graphic_design_title">Графический дизайн</string>
+    <string name="cat_graphic_design_desc">UI/UX, Брендинг, Иллюстрация.</string>
+    <string name="cat_data_science_title">Data Science</string>
+    <string name="cat_data_science_desc">Машинное обучение, Аналитика.</string>
+    <string name="cat_product_manage_title">Менеджмент продукта</string>
+    <string name="cat_product_manage_desc">Стратегия, Планирование, Agile.</string>
+
+    <!-- Catalog Group Items -->
+    <string name="group_it">IT &amp; Разработка</string>
+    <string name="group_medicine">Медицина</string>
+    <string name="group_design">Дизайн &amp;\nТворчество</string>
+    <string name="group_business">Бизнес &amp; Финансы</string>
+
+    <!-- User Info Screen -->
+    <string name="user_info_title">Информация о себе</string>
+    <string name="user_info_subtitle">Заполните данные для профиля</string>
+    <string name="surname_hint">Фамилия</string>
+    <string name="dob_hint">Дата рождения</string>
+    <string name="position_hint">Должность</string>
+    <string name="next_action">Далее</string>
+
+    <!-- Avatar Selection Screen -->
+    <string name="avatar_title">Выберите аватар</string>
+    <string name="avatar_subtitle">Загрузите фото профиля</string>
+    <string name="finish_action">Завершить</string>
+    <string name="skip_action">Пропустить</string>
+    <string name="start_button">Начать</string>
+    
+    <!-- Edit Profile -->
+    <string name="edit_profile_title">Редактирование профиля</string>
+    <string name="email_label">Email</string>
+    <string name="logout_button">Выйти из аккаунта</string>
+    <string name="save_changes">Сохранить</string>
+</resources>
