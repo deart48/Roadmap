@@ -31,6 +31,23 @@ class RoadmapService {
         }
     }
 
+    /** Прогресс по шагам одной дорожной карты (для UI галочек). */
+    suspend fun getStepProgressForRoadmap(userId: Long, roadmapId: Long): List<UserStepProgressDto> = dbQuery {
+        (UserStepProgress innerJoin RoadmapSteps)
+            .select(UserStepProgress.columns)
+            .where {
+                (UserStepProgress.userId eq userId) and (RoadmapSteps.roadmapId eq roadmapId)
+            }
+            .map {
+                UserStepProgressDto(
+                    userId = it[UserStepProgress.userId].value,
+                    stepId = it[UserStepProgress.stepId].value,
+                    isCompleted = it[UserStepProgress.isCompleted],
+                    completedAt = it[UserStepProgress.completedAt]?.toString(),
+                )
+            }
+    }
+
     suspend fun getFavorites(userId: Long): List<RoadmapDto> = dbQuery {
         (Favorites innerJoin Roadmaps)
             .select(Roadmaps.columns)

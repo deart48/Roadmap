@@ -1,9 +1,5 @@
 package ru.vsu.roadmap.ui.screens
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,8 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,29 +39,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import ru.vsu.roadmap.R
+import ru.vsu.roadmap.data.model.RoadmapDto
+import ru.vsu.roadmap.ui.components.DefaultUserAvatar
+import ru.vsu.roadmap.ui.components.RoadmapCircleBadge
 import ru.vsu.roadmap.ui.viewmodel.ProfileViewModel
-
-data class ProfileRoadmapItem(
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    onRoadmapOpened: () -> Unit = {},
 ) {
     // Reload data every time the screen is displayed
     androidx.compose.runtime.LaunchedEffect(Unit) {
@@ -75,23 +64,13 @@ fun ProfileScreen(
     }
 
     val profile = viewModel.profile
-    
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var selectedItem by remember { mutableStateOf<ProfileRoadmapItem?>(null) }
+
+    var selectedRoadmap by remember { mutableStateOf<RoadmapDto?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            selectedImageUri = uri
-            // TODO: Upload image via ViewModel
-        }
-    }
-
-    if (selectedItem != null) {
+    if (selectedRoadmap != null) {
         ModalBottomSheet(
-            onDismissRequest = { selectedItem = null },
+            onDismissRequest = { selectedRoadmap = null },
             sheetState = sheetState,
             containerColor = Color.White
         ) {
@@ -101,8 +80,9 @@ fun ProfileScreen(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val rm = selectedRoadmap!!
                 Text(
-                    text = selectedItem!!.title,
+                    text = rm.title,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
@@ -112,27 +92,55 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Icon(
-                    imageVector = selectedItem!!.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(80.dp),
-                    tint = Color.Black
-                )
+                RoadmapCircleBadge(size = 80.dp)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = selectedItem!!.subtitle,
+                    text = rm.description ?: "",
                     style = MaterialTheme.typography.bodyLarge.copy(color = Color.Gray),
                     textAlign = TextAlign.Center
                 )
 
+                if (rm.id == viewModel.activeRoadmap?.id && viewModel.activeProgress != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(
+                            R.string.profile_roadmap_progress_hint,
+                            viewModel.activeProgress!!.progressPercent,
+                        ),
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.Black),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val steps = viewModel.currentSteps
+                if (steps.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.home_roadmap_steps_header),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                    steps.forEachIndexed { index, step ->
+                        Text(
+                            text = "${index + 1}. ${step.title}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.align(Alignment.Start).padding(vertical = 2.dp)
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(32.dp))
 
+                val alreadyStarted = viewModel.startedRoadmapIds.contains(rm.id)
                 Button(
                     onClick = {
-                        // TODO: Navigate or start
-                        selectedItem = null
+                        viewModel.selectRoadmapForViewer(rm.id) {
+                            selectedRoadmap = null
+                            onRoadmapOpened()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -144,7 +152,11 @@ fun ProfileScreen(
                     shape = RoundedCornerShape(28.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.start_button),
+                        text = if (alreadyStarted) {
+                            stringResource(R.string.catalog_continue)
+                        } else {
+                            stringResource(R.string.catalog_start)
+                        },
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -179,39 +191,18 @@ fun ProfileScreen(
         if (viewModel.isLoading) {
              CircularProgressIndicator(color = Color.Black)
         } else if (profile != null) {
-            // Avatar
+            // Avatar (фиксированный для всех пользователей)
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .background(Color.LightGray.copy(alpha = 0.3f))
-                    .clickable {
-                        launcher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                    },
+                    .background(Color.LightGray.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                if (selectedImageUri != null) {
-                    AsyncImage(
-                        model = selectedImageUri,
-                        contentDescription = profile.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else if (!profile.avatarUrl.isNullOrEmpty()) {
-                     AsyncImage(
-                        model = profile.avatarUrl,
-                        contentDescription = profile.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(100.dp),
-                        tint = Color.Gray
-                    )
-                }
+                DefaultUserAvatar(
+                    modifier = Modifier.fillMaxSize(),
+                    contentDescription = profile.name,
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -254,19 +245,16 @@ fun ProfileScreen(
 
                 val currentProgressTitle = viewModel.activeRoadmap!!.title
                 val progress = viewModel.activeProgress!!
-                // Could determine next step title if we fetched steps, but simplified for now
-                val currentProgressSubtitle = "${progress.progressPercent}% Completed"
                 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(120.dp)
                         .clickable {
-                            selectedItem = ProfileRoadmapItem(
-                                title = currentProgressTitle,
-                                subtitle = currentProgressSubtitle,
-                                icon = Icons.Default.Settings // Placeholder
-                            )
+                            viewModel.activeRoadmap?.let { ar ->
+                                selectedRoadmap = ar
+                                viewModel.loadSteps(ar.id)
+                            }
                         },
                     shape = RoundedCornerShape(12.dp),
                     border = BorderStroke(2.dp, Color.Black),
@@ -351,11 +339,8 @@ fun ProfileScreen(
                                 .weight(1f)
                                 .height(80.dp)
                                 .clickable {
-                                     selectedItem = ProfileRoadmapItem(
-                                        title = fav.title,
-                                        subtitle = fav.description ?: "",
-                                        icon = Icons.Default.Edit // Placeholder
-                                    )
+                                    selectedRoadmap = fav
+                                    viewModel.loadSteps(fav.id)
                                 },
                             shape = RoundedCornerShape(12.dp),
                             border = BorderStroke(2.dp, Color.Black),

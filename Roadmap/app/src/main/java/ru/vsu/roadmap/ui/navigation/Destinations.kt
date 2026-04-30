@@ -9,7 +9,6 @@ object Routes {
     const val FOGOTPASS = "forgorPass"
     const val VERIFICATION = "verification"
     const val USER_INFO = "userInfo"
-    const val AVATAR_SELECTION = "avatarSelection"
 
 }
 

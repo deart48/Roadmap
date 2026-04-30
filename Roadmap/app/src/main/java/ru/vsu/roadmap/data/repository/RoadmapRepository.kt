@@ -4,6 +4,7 @@ import ru.vsu.roadmap.data.api.RoadmapApi
 import ru.vsu.roadmap.data.model.RoadmapDto
 import ru.vsu.roadmap.data.model.RoadmapStepDto
 import ru.vsu.roadmap.data.model.UserRoadmapProgressDto
+import ru.vsu.roadmap.data.model.UserStepProgressDto
 import ru.vsu.roadmap.utils.TokenManager
 
 class RoadmapRepository(
@@ -36,6 +37,14 @@ class RoadmapRepository(
         return try {
             val steps = api.getRoadmapSteps(getBearerToken(), id)
             Result.success(steps)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getStepProgress(roadmapId: Long): Result<List<UserStepProgressDto>> {
+        return try {
+            Result.success(api.getStepProgress(getBearerToken(), roadmapId))
         } catch (e: Exception) {
             Result.failure(e)
         }

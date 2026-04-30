@@ -15,6 +15,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,6 +44,7 @@ import ru.vsu.roadmap.ui.viewmodel.CatalogViewModel
 import ru.vsu.roadmap.ui.viewmodel.EditProfileViewModel
 import ru.vsu.roadmap.ui.viewmodel.HomeViewModel
 import ru.vsu.roadmap.ui.viewmodel.ProfileViewModel
+import ru.vsu.roadmap.ui.viewmodel.RoadmapViewModel
 
 sealed class NavigationIcon {
     data class Vector(val imageVector: ImageVector) : NavigationIcon()
@@ -52,7 +54,7 @@ sealed class NavigationIcon {
 @Composable
 fun NavMenu(
     viewModelFactory: ViewModelFactory,
-    onLogoutClick: () -> Unit = {}
+    onLogoutClick: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     
@@ -67,21 +69,73 @@ fun NavMenu(
                 navController = navController,
                 startDestination = BottomRoutes.HOME
             ) {
-                composable(BottomRoutes.HOME) { 
+                composable(BottomRoutes.HOME) {
                     val homeViewModel: HomeViewModel = viewModel(factory = viewModelFactory)
-                    HomeScreen(viewModel = homeViewModel) 
+                    HomeScreen(
+                        viewModel = homeViewModel,
+                        onRoadmapOpened = {
+                            navController.navigate(BottomRoutes.ROADMAP) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    )
                 }
                 composable(BottomRoutes.CATALOG) {
                     val catalogViewModel: CatalogViewModel = viewModel(factory = viewModelFactory)
-                    CatalogScreen(viewModel = catalogViewModel) 
+                    CatalogScreen(
+                        viewModel = catalogViewModel,
+                        onRoadmapOpened = {
+                            navController.navigate(BottomRoutes.ROADMAP) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    )
                 }
-                composable(BottomRoutes.ROADMAP) { RoadmapScreen() }
-                composable(BottomRoutes.PROFILE) { 
+                composable(BottomRoutes.ROADMAP) {
+                    val roadmapViewModel: RoadmapViewModel = viewModel(factory = viewModelFactory)
+                    val navEntry by navController.currentBackStackEntryAsState()
+                    val route = navEntry?.destination?.route
+                    LaunchedEffect(route) {
+                        if (route == BottomRoutes.ROADMAP) {
+                            roadmapViewModel.load()
+                        }
+                    }
+                    RoadmapScreen(
+                        viewModel = roadmapViewModel,
+                        onGoToCatalog = {
+                            navController.navigate(BottomRoutes.CATALOG) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    )
+                }
+                composable(BottomRoutes.PROFILE) {
                     val profileViewModel: ProfileViewModel = viewModel(factory = viewModelFactory)
                     ProfileScreen(
                         viewModel = profileViewModel,
-                        onSettingsClick = { navController.navigate(BottomRoutes.EDIT_PROFILE) }
-                    ) 
+                        onSettingsClick = { navController.navigate(BottomRoutes.EDIT_PROFILE) },
+                        onRoadmapOpened = {
+                            navController.navigate(BottomRoutes.ROADMAP) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                    )
                 }
                 composable(BottomRoutes.EDIT_PROFILE) {
                     val editProfileViewModel: EditProfileViewModel = viewModel(factory = viewModelFactory)

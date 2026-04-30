@@ -1,9 +1,9 @@
 package ru.vsu.config
 
 data class AppConfig(
-    val dbUrl: String = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/postgres",
+    val dbUrl: String = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/backend",
     val dbUser: String = System.getenv("DB_USER") ?: "deart",
-    val dbPassword: String = System.getenv("DB_PASSWORD") ?: "Tgbrbujdyj321",
+    val dbPassword: String = System.getenv("DB_PASSWORD") ?: "1234",
     
     val jwtSecret: String = System.getenv("JWT_SECRET") ?: "secret",
     val jwtIssuer: String = System.getenv("JWT_ISSUER") ?: "http://0.0.0.0:8080/",

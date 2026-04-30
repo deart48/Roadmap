@@ -87,6 +87,32 @@ object DatabaseSeeder {
                 it[orderIndex] = 3
             }
 
+            // Этапы 4–7: экран Roadmap рассчитан ровно на 7 шагов для этой карты
+            RoadmapSteps.insert {
+                it[roadmapId] = androidRoadmapId.value
+                it[title] = "Architecture & State"
+                it[description] = "MVVM, ViewModel, UI state."
+                it[orderIndex] = 4
+            }
+            RoadmapSteps.insert {
+                it[roadmapId] = androidRoadmapId.value
+                it[title] = "Data Layer"
+                it[description] = "Room, repositories, offline-first basics."
+                it[orderIndex] = 5
+            }
+            RoadmapSteps.insert {
+                it[roadmapId] = androidRoadmapId.value
+                it[title] = "Networking"
+                it[description] = "Retrofit, OkHttp, serialization."
+                it[orderIndex] = 6
+            }
+            RoadmapSteps.insert {
+                it[roadmapId] = androidRoadmapId.value
+                it[title] = "Next: Fullstack"
+                it[description] = "Следующий этап: бэкенд, БД и интеграция с клиентом."
+                it[orderIndex] = 7
+            }
+
             // 4. Create Steps for Backend Roadmap
             RoadmapSteps.insert {
                 it[roadmapId] = backendRoadmapId.value

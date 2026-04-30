@@ -1,6 +1,5 @@
 package ru.vsu.roadmap.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -54,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -63,10 +61,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.vsu.roadmap.R
 import ru.vsu.roadmap.data.model.RoadmapDto
+import ru.vsu.roadmap.ui.components.RoadmapCircleBadge
 import ru.vsu.roadmap.ui.viewmodel.CatalogViewModel
 
 @Composable
-fun CatalogScreen(viewModel: CatalogViewModel? = null) {
+fun CatalogScreen(
+    viewModel: CatalogViewModel? = null,
+    onRoadmapOpened: () -> Unit = {},
+) {
     var isListView by remember { mutableStateOf(true) }
 
     // If VM is null (e.g. preview), we can't do much or use mock.
@@ -183,10 +185,14 @@ fun CatalogScreen(viewModel: CatalogViewModel? = null) {
             CatalogListView(
                 roadmaps = viewModel?.roadmaps ?: emptyList(),
                 favoriteIds = viewModel?.favoriteIds ?: emptySet(),
+                startedRoadmapIds = viewModel?.startedRoadmapIds ?: emptySet(),
                 steps = viewModel?.currentSteps ?: emptyList(),
                 onToggleFavorite = { viewModel?.toggleFavorite(it) },
                 onItemClick = { viewModel?.loadSteps(it.id) },
-                onStartClick = { viewModel?.startRoadmap(it.id) }
+                onPrimaryRoadmapAction = { roadmap, _, onDone ->
+                    viewModel?.selectRoadmapForViewer(roadmap.id, onDone)
+                },
+                onRoadmapChosen = onRoadmapOpened,
             )
         }
     }
@@ -202,14 +208,16 @@ fun Modifier.BoxBorder(width: androidx.compose.ui.unit.Dp, color: Color, shape: 
 fun CatalogListView(
     roadmaps: List<RoadmapDto>,
     favoriteIds: Set<Long> = emptySet(),
+    startedRoadmapIds: Set<Long> = emptySet(),
     steps: List<ru.vsu.roadmap.data.model.RoadmapStepDto> = emptyList(),
     onToggleFavorite: (RoadmapDto) -> Unit = {},
     onItemClick: (RoadmapDto) -> Unit = {},
-    onStartClick: (RoadmapDto) -> Unit = {}
+    onPrimaryRoadmapAction: (RoadmapDto, Boolean, () -> Unit) -> Unit =
+        { _, _, onDone -> onDone() },
+    onRoadmapChosen: () -> Unit = {},
 ) {
     var selectedItem by remember { mutableStateOf<RoadmapDto?>(null) }
     val sheetState = rememberModalBottomSheetState()
-    val context = LocalContext.current
 
     if (selectedItem != null) {
         // Trigger fetch steps when item selected (handled by callback in parent)
@@ -238,21 +246,7 @@ fun CatalogListView(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (selectedItem!!.imageUrl != null) {
-                    coil.compose.AsyncImage(
-                        model = selectedItem!!.imageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp),
-                        contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp),
-                        tint = Color.Black
-                    )
-                }
+                RoadmapCircleBadge(size = 80.dp)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -282,11 +276,14 @@ fun CatalogListView(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                val item = selectedItem!!
+                val alreadyStarted = startedRoadmapIds.contains(item.id)
                 Button(
                     onClick = {
-                        onStartClick(selectedItem!!)
-                        selectedItem = null
-                        Toast.makeText(context, "Roadmap started!", Toast.LENGTH_SHORT).show()
+                        onPrimaryRoadmapAction(item, alreadyStarted) {
+                            selectedItem = null
+                            onRoadmapChosen()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -298,7 +295,11 @@ fun CatalogListView(
                     shape = RoundedCornerShape(28.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.start_button),
+                        text = if (alreadyStarted) {
+                            stringResource(R.string.catalog_continue)
+                        } else {
+                            stringResource(R.string.catalog_start)
+                        },
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -334,33 +335,7 @@ fun CatalogListView(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Icon Box
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(Color.White, RoundedCornerShape(16.dp))
-                            .border(1.dp, Color.Black, RoundedCornerShape(16.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (item.imageUrl != null) {
-                            coil.compose.AsyncImage(
-                                model = item.imageUrl,
-                                contentDescription = null,
-                                modifier = Modifier.size(40.dp)
-                            )
-                        } 
-                        
-                        // Fallback logic: check if loaded? AsyncImage handles it internally usually via error param.
-                        // Since I can't easily check state here, I'll just put the Icon behind or if null.
-                        if (item.imageUrl == null) {
-                             Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = null,
-                                tint = Color.Black,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                    }
+                    RoadmapCircleBadge(size = 48.dp)
 
                     Spacer(modifier = Modifier.width(16.dp))
 

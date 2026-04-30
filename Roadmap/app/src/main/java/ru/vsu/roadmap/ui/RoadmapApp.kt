@@ -7,7 +7,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.vsu.roadmap.ui.components.NavMenu
 import ru.vsu.roadmap.ui.navigation.Routes
-import ru.vsu.roadmap.ui.screens.AvatarSelectionScreen
+import ru.vsu.roadmap.data.repository.AuthRepository
+import ru.vsu.roadmap.utils.SelectedRoadmapStore
 import ru.vsu.roadmap.ui.screens.ForgotPasswordScreen
 import ru.vsu.roadmap.ui.screens.LoginScreen
 import ru.vsu.roadmap.ui.screens.RegisterScreen
@@ -20,17 +21,25 @@ import ru.vsu.roadmap.ui.viewmodel.RegisterViewModel
 import ru.vsu.roadmap.ui.viewmodel.UserInfoViewModel
 
 @Composable
-fun RoadmapApp(viewModelFactory: ViewModelFactory) {
+fun RoadmapApp(
+    viewModelFactory: ViewModelFactory,
+    selectedRoadmapStore: SelectedRoadmapStore,
+    authRepository: AuthRepository,
+) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Routes.SPLASH) {
         composable(Routes.SPLASH) {
             SplashScreen(onSplashFinished = {
-                // Check if logged in (could use AuthRepository directly if passed, but simpler logic here for now)
-                // ideally, check isLoggedIn from a MainViewModel or similar.
-                // For now, go to Welcome.
-                navController.navigate(Routes.WELCOME) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
+                if (authRepository.isLoggedIn()) {
+                    navController.navigate(Routes.MAIN) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                } else {
+                    navController.navigate(Routes.WELCOME) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
                 }
             })
         }
@@ -76,18 +85,6 @@ fun RoadmapApp(viewModelFactory: ViewModelFactory) {
             UserInfoScreen(
                 viewModel = userInfoViewModel,
                 onNextClick = {
-                    navController.navigate(Routes.AVATAR_SELECTION)
-                }
-            )
-        }
-        composable(Routes.AVATAR_SELECTION) {
-            AvatarSelectionScreen(
-                onFinishClick = {
-                    navController.navigate(Routes.MAIN) {
-                        popUpTo(Routes.USER_INFO) { inclusive = true }
-                    }
-                },
-                onSkipClick = {
                     navController.navigate(Routes.MAIN) {
                         popUpTo(Routes.USER_INFO) { inclusive = true }
                     }
@@ -120,6 +117,8 @@ fun RoadmapApp(viewModelFactory: ViewModelFactory) {
             NavMenu(
                 viewModelFactory = viewModelFactory,
                 onLogoutClick = {
+                    authRepository.logout()
+                    selectedRoadmapStore.clearSelection()
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.MAIN) { inclusive = true }
                     }

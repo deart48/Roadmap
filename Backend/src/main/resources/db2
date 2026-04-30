@@ -1,0 +1,705 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict CMfzzSyhRzKBEhnQsBbXqVefBoWQhvMKJV5DGdbCfe4COwaeRpftU2dMBybfSmV
+
+-- Dumped from database version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
+-- Dumped by pg_dump version 16.13 (Ubuntu 16.13-0ubuntu0.24.04.1)
+
+-- Started on 2026-04-30 01:35:05 MSK
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 220 (class 1259 OID 16395)
+-- Name: favorites_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.favorites_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.favorites_id_seq OWNER TO deart;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 228 (class 1259 OID 16459)
+-- Name: favorites; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.favorites (
+    id bigint DEFAULT nextval('public.favorites_id_seq'::regclass) NOT NULL,
+    user_id bigint NOT NULL,
+    roadmap_id bigint NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.favorites OWNER TO deart;
+
+--
+-- TOC entry 218 (class 1259 OID 16393)
+-- Name: roadmap_steps_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.roadmap_steps_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.roadmap_steps_id_seq OWNER TO deart;
+
+--
+-- TOC entry 226 (class 1259 OID 16433)
+-- Name: roadmap_steps; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.roadmap_steps (
+    id bigint DEFAULT nextval('public.roadmap_steps_id_seq'::regclass) NOT NULL,
+    roadmap_id bigint NOT NULL,
+    title character varying(255) NOT NULL,
+    description text,
+    image_url text,
+    order_index integer NOT NULL
+);
+
+
+ALTER TABLE public.roadmap_steps OWNER TO deart;
+
+--
+-- TOC entry 217 (class 1259 OID 16392)
+-- Name: roadmaps_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.roadmaps_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.roadmaps_id_seq OWNER TO deart;
+
+--
+-- TOC entry 225 (class 1259 OID 16424)
+-- Name: roadmaps; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.roadmaps (
+    id bigint DEFAULT nextval('public.roadmaps_id_seq'::regclass) NOT NULL,
+    title character varying(255) NOT NULL,
+    description text,
+    image_url text,
+    created_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.roadmaps OWNER TO deart;
+
+--
+-- TOC entry 219 (class 1259 OID 16394)
+-- Name: step_links_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.step_links_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.step_links_id_seq OWNER TO deart;
+
+--
+-- TOC entry 227 (class 1259 OID 16446)
+-- Name: step_links; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.step_links (
+    id bigint DEFAULT nextval('public.step_links_id_seq'::regclass) NOT NULL,
+    step_id bigint NOT NULL,
+    title character varying(255),
+    url text NOT NULL
+);
+
+
+ALTER TABLE public.step_links OWNER TO deart;
+
+--
+-- TOC entry 216 (class 1259 OID 16391)
+-- Name: user_profiles_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.user_profiles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.user_profiles_id_seq OWNER TO deart;
+
+--
+-- TOC entry 224 (class 1259 OID 16409)
+-- Name: user_profiles; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.user_profiles (
+    id bigint DEFAULT nextval('public.user_profiles_id_seq'::regclass) NOT NULL,
+    user_id bigint NOT NULL,
+    name character varying(255),
+    about text,
+    avatar_url text,
+    surname character varying(255),
+    date date
+);
+
+
+ALTER TABLE public.user_profiles OWNER TO deart;
+
+--
+-- TOC entry 221 (class 1259 OID 16396)
+-- Name: user_roadmap_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.user_roadmap_progress_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.user_roadmap_progress_id_seq OWNER TO deart;
+
+--
+-- TOC entry 229 (class 1259 OID 16478)
+-- Name: user_roadmap_progress; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.user_roadmap_progress (
+    id bigint DEFAULT nextval('public.user_roadmap_progress_id_seq'::regclass) NOT NULL,
+    user_id bigint NOT NULL,
+    roadmap_id bigint NOT NULL,
+    progress_percent integer NOT NULL,
+    last_step_id bigint,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    in_progress boolean DEFAULT false NOT NULL,
+    CONSTRAINT user_roadmap_progress_progress_percent_check CHECK (((progress_percent >= 0) AND (progress_percent <= 100)))
+);
+
+
+ALTER TABLE public.user_roadmap_progress OWNER TO deart;
+
+--
+-- TOC entry 222 (class 1259 OID 16397)
+-- Name: user_step_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.user_step_progress_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.user_step_progress_id_seq OWNER TO deart;
+
+--
+-- TOC entry 230 (class 1259 OID 16503)
+-- Name: user_step_progress; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.user_step_progress (
+    id bigint DEFAULT nextval('public.user_step_progress_id_seq'::regclass) NOT NULL,
+    user_id bigint NOT NULL,
+    step_id bigint NOT NULL,
+    is_completed boolean DEFAULT false NOT NULL,
+    completed_at timestamp without time zone
+);
+
+
+ALTER TABLE public.user_step_progress OWNER TO deart;
+
+--
+-- TOC entry 215 (class 1259 OID 16390)
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: deart
+--
+
+CREATE SEQUENCE public.users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.users_id_seq OWNER TO deart;
+
+--
+-- TOC entry 223 (class 1259 OID 16398)
+-- Name: users; Type: TABLE; Schema: public; Owner: deart
+--
+
+CREATE TABLE public.users (
+    id bigint DEFAULT nextval('public.users_id_seq'::regclass) NOT NULL,
+    email character varying(255) NOT NULL,
+    password_hash text NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO deart;
+
+--
+-- TOC entry 3656 (class 0 OID 16459)
+-- Dependencies: 228
+-- Data for Name: favorites; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.favorites (id, user_id, roadmap_id, created_at) FROM stdin;
+1	5	1	2026-03-07 18:41:19.052732
+2	6	2	2026-03-07 18:49:02.216287
+3	6	1	2026-03-07 18:49:27.79879
+\.
+
+
+--
+-- TOC entry 3654 (class 0 OID 16433)
+-- Dependencies: 226
+-- Data for Name: roadmap_steps; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.roadmap_steps (id, roadmap_id, title, description, image_url, order_index) FROM stdin;
+1	1	Kotlin Basics	Learn the fundamentals: Variables, Control Flow, Functions.	\N	1
+2	1	Android Studio Setup	Install and configure the IDE for development.	\N	2
+3	1	Jetpack Compose	Modern UI toolkit for Android.	\N	3
+4	2	Ktor Basics	Routing, Plugins, and Application Structure.	\N	1
+5	2	Database with Exposed	Connecting to PostgreSQL.	\N	2
+\.
+
+
+--
+-- TOC entry 3653 (class 0 OID 16424)
+-- Dependencies: 225
+-- Data for Name: roadmaps; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.roadmaps (id, title, description, image_url, created_at) FROM stdin;
+1	Android Developer	Become a professional Android developer using Kotlin.	https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg	2026-03-07 18:41:19.032611
+2	Kotlin Backend	Master server-side development with Ktor and Exposed.	https://resources.jetbrains.com/storage/products/ktor/img/ktor_logo.svg	2026-03-07 18:41:19.034448
+\.
+
+
+--
+-- TOC entry 3655 (class 0 OID 16446)
+-- Dependencies: 227
+-- Data for Name: step_links; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.step_links (id, step_id, title, url) FROM stdin;
+1	1	Kotlin Docs	https://kotlinlang.org/docs/home.html
+\.
+
+
+--
+-- TOC entry 3652 (class 0 OID 16409)
+-- Dependencies: 224
+-- Data for Name: user_profiles; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.user_profiles (id, user_id, name, about, avatar_url, surname, date) FROM stdin;
+1	4	Alice Wonderland	Senior Android Developer	https://ui-avatars.com/api/?name=Alice+Wonderland	\N	\N
+2	5	Bob Builder	Fullstack Enthusiast	https://ui-avatars.com/api/?name=Bob+Builder	\N	\N
+3	6	demo	it	\N	demo	2026-03-03
+4	7	eye	rur	\N	eheh	2026-04-07
+5	8	g	gg	\N	v	2026-04-15
+\.
+
+
+--
+-- TOC entry 3657 (class 0 OID 16478)
+-- Dependencies: 229
+-- Data for Name: user_roadmap_progress; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.user_roadmap_progress (id, user_id, roadmap_id, progress_percent, last_step_id, updated_at, in_progress) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3658 (class 0 OID 16503)
+-- Dependencies: 230
+-- Data for Name: user_step_progress; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.user_step_progress (id, user_id, step_id, is_completed, completed_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3651 (class 0 OID 16398)
+-- Dependencies: 223
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: deart
+--
+
+COPY public.users (id, email, password_hash, created_at) FROM stdin;
+4	alice@example.com	$2a$10$nxFBLWSxvkRouzNGdo0ArOCZya09huEO9D6M3pLhOd.Tr6CPu64oS	2026-03-07 18:41:18.815283
+5	bob@example.com	$2a$10$nxFBLWSxvkRouzNGdo0ArOCZya09huEO9D6M3pLhOd.Tr6CPu64oS	2026-03-07 18:41:19.029895
+6	test@bk.ru	$2a$10$Io3E7kKYUFyGrcErhsFYuug9OIQsAm8nNo.AbgQ.kwgPl6hkm3QYS	2026-03-07 18:47:50.021914
+7	yest@test.ru	$2a$10$9SO55OMwQ03z5xUhlxyc3uFVcYOOq400f3biMO3WNfnydO73pnBd.	2026-04-28 16:50:04.135802
+8	test2@bk.ru	$2a$10$hjOgk.TdK2lXV2RKza7d/.daBAsbN3HvhqvxkEqWZpNQ8GrUZvVEe	2026-04-29 20:44:08.731805
+\.
+
+
+--
+-- TOC entry 3664 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: favorites_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.favorites_id_seq', 3, true);
+
+
+--
+-- TOC entry 3665 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: roadmap_steps_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.roadmap_steps_id_seq', 5, true);
+
+
+--
+-- TOC entry 3666 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: roadmaps_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.roadmaps_id_seq', 2, true);
+
+
+--
+-- TOC entry 3667 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: step_links_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.step_links_id_seq', 1, true);
+
+
+--
+-- TOC entry 3668 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: user_profiles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.user_profiles_id_seq', 5, true);
+
+
+--
+-- TOC entry 3669 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: user_roadmap_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.user_roadmap_progress_id_seq', 1, false);
+
+
+--
+-- TOC entry 3670 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: user_step_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.user_step_progress_id_seq', 1, false);
+
+
+--
+-- TOC entry 3671 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: deart
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 8, true);
+
+
+--
+-- TOC entry 3476 (class 2606 OID 16465)
+-- Name: favorites favorites_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT favorites_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3471 (class 2606 OID 16440)
+-- Name: roadmap_steps roadmap_steps_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.roadmap_steps
+    ADD CONSTRAINT roadmap_steps_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3468 (class 2606 OID 16432)
+-- Name: roadmaps roadmaps_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.roadmaps
+    ADD CONSTRAINT roadmaps_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3474 (class 2606 OID 16453)
+-- Name: step_links step_links_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.step_links
+    ADD CONSTRAINT step_links_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3479 (class 2606 OID 16467)
+-- Name: favorites uq_favorite; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT uq_favorite UNIQUE (user_id, roadmap_id);
+
+
+--
+-- TOC entry 3482 (class 2606 OID 16487)
+-- Name: user_roadmap_progress uq_user_roadmap; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_roadmap_progress
+    ADD CONSTRAINT uq_user_roadmap UNIQUE (user_id, roadmap_id);
+
+
+--
+-- TOC entry 3487 (class 2606 OID 16511)
+-- Name: user_step_progress uq_user_step; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_step_progress
+    ADD CONSTRAINT uq_user_step UNIQUE (user_id, step_id);
+
+
+--
+-- TOC entry 3464 (class 2606 OID 16416)
+-- Name: user_profiles user_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_profiles
+    ADD CONSTRAINT user_profiles_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3466 (class 2606 OID 16418)
+-- Name: user_profiles user_profiles_user_id_key; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_profiles
+    ADD CONSTRAINT user_profiles_user_id_key UNIQUE (user_id);
+
+
+--
+-- TOC entry 3484 (class 2606 OID 16485)
+-- Name: user_roadmap_progress user_roadmap_progress_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_roadmap_progress
+    ADD CONSTRAINT user_roadmap_progress_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3489 (class 2606 OID 16509)
+-- Name: user_step_progress user_step_progress_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_step_progress
+    ADD CONSTRAINT user_step_progress_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3460 (class 2606 OID 16408)
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 3462 (class 2606 OID 16406)
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3477 (class 1259 OID 16522)
+-- Name: idx_favorites_user; Type: INDEX; Schema: public; Owner: deart
+--
+
+CREATE INDEX idx_favorites_user ON public.favorites USING btree (user_id);
+
+
+--
+-- TOC entry 3472 (class 1259 OID 16523)
+-- Name: idx_links_step; Type: INDEX; Schema: public; Owner: deart
+--
+
+CREATE INDEX idx_links_step ON public.step_links USING btree (step_id);
+
+
+--
+-- TOC entry 3480 (class 1259 OID 16524)
+-- Name: idx_progress_user; Type: INDEX; Schema: public; Owner: deart
+--
+
+CREATE INDEX idx_progress_user ON public.user_roadmap_progress USING btree (user_id);
+
+
+--
+-- TOC entry 3485 (class 1259 OID 16525)
+-- Name: idx_step_progress_user; Type: INDEX; Schema: public; Owner: deart
+--
+
+CREATE INDEX idx_step_progress_user ON public.user_step_progress USING btree (user_id);
+
+
+--
+-- TOC entry 3469 (class 1259 OID 16526)
+-- Name: idx_steps_roadmap; Type: INDEX; Schema: public; Owner: deart
+--
+
+CREATE INDEX idx_steps_roadmap ON public.roadmap_steps USING btree (roadmap_id);
+
+
+--
+-- TOC entry 3493 (class 2606 OID 16468)
+-- Name: favorites fk_favorite_roadmap; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT fk_favorite_roadmap FOREIGN KEY (roadmap_id) REFERENCES public.roadmaps(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3494 (class 2606 OID 16473)
+-- Name: favorites fk_favorite_user; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT fk_favorite_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3492 (class 2606 OID 16454)
+-- Name: step_links fk_link_step; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.step_links
+    ADD CONSTRAINT fk_link_step FOREIGN KEY (step_id) REFERENCES public.roadmap_steps(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3490 (class 2606 OID 16419)
+-- Name: user_profiles fk_profile_user; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_profiles
+    ADD CONSTRAINT fk_profile_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3495 (class 2606 OID 16488)
+-- Name: user_roadmap_progress fk_progress_roadmap; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_roadmap_progress
+    ADD CONSTRAINT fk_progress_roadmap FOREIGN KEY (roadmap_id) REFERENCES public.roadmaps(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3496 (class 2606 OID 16498)
+-- Name: user_roadmap_progress fk_progress_step; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_roadmap_progress
+    ADD CONSTRAINT fk_progress_step FOREIGN KEY (last_step_id) REFERENCES public.roadmap_steps(id) ON DELETE SET NULL;
+
+
+--
+-- TOC entry 3497 (class 2606 OID 16493)
+-- Name: user_roadmap_progress fk_progress_user; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_roadmap_progress
+    ADD CONSTRAINT fk_progress_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3498 (class 2606 OID 16512)
+-- Name: user_step_progress fk_step_progress_step; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_step_progress
+    ADD CONSTRAINT fk_step_progress_step FOREIGN KEY (step_id) REFERENCES public.roadmap_steps(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3499 (class 2606 OID 16517)
+-- Name: user_step_progress fk_step_progress_user; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.user_step_progress
+    ADD CONSTRAINT fk_step_progress_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3491 (class 2606 OID 16441)
+-- Name: roadmap_steps fk_step_roadmap; Type: FK CONSTRAINT; Schema: public; Owner: deart
+--
+
+ALTER TABLE ONLY public.roadmap_steps
+    ADD CONSTRAINT fk_step_roadmap FOREIGN KEY (roadmap_id) REFERENCES public.roadmaps(id) ON DELETE CASCADE;
+
+
+-- Completed on 2026-04-30 01:35:06 MSK
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict CMfzzSyhRzKBEhnQsBbXqVefBoWQhvMKJV5DGdbCfe4COwaeRpftU2dMBybfSmV
+

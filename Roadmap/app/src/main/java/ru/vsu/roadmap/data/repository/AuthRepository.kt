@@ -44,6 +44,6 @@ class AuthRepository(
     }
     
     fun logout() {
-        tokenManager.clearToken()
+        tokenManager.clearSession()
     }
 }

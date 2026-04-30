@@ -25,6 +25,8 @@
     <string name="search_hint">Поиск профессий</string>
     <string name="suggested_roadmaps">Возможно вам подойдет</string>
     <string name="favorite_roadmaps">Избранные дорожные карты</string>
+    <string name="home_roadmap_steps_header">Этапы:</string>
+    <string name="profile_roadmap_progress_hint">Текущий прогресс: %1$d%%</string>
     
     <!-- Card Titles -->
     <string name="web_dev">Веб-разработчик</string>
@@ -61,6 +63,13 @@
     <!-- Roadmap Screen -->
     <string name="continue_button">Продолжить</string>
     <string name="html_css_basics">HTML &amp; CSS\nBasics</string>
+    <string name="roadmap_retry">Повторить</string>
+    <string name="roadmap_steps_count_error">Для этой дорожной карты на сервере должно быть ровно 7 этапов. Обновите данные или выберите другую карту.</string>
+    <string name="roadmap_empty_title">Дорожная карта не выбрана</string>
+    <string name="roadmap_empty_subtitle">Выберите курс в каталоге, чтобы видеть этапы и прогресс на этом экране.</string>
+    <string name="roadmap_go_to_catalog">Перейти в каталог</string>
+    <string name="catalog_continue">Продолжить</string>
+    <string name="catalog_start">Начать</string>
 
     <!-- Catalog Screen -->
     <string name="search_catalog_hint">Поиск дорожных карт</string>
@@ -91,11 +100,6 @@
     <string name="position_hint">Должность</string>
     <string name="next_action">Далее</string>
 
-    <!-- Avatar Selection Screen -->
-    <string name="avatar_title">Выберите аватар</string>
-    <string name="avatar_subtitle">Загрузите фото профиля</string>
-    <string name="finish_action">Завершить</string>
-    <string name="skip_action">Пропустить</string>
     <string name="start_button">Начать</string>
     
     <!-- Edit Profile -->
@@ -103,4 +107,16 @@
     <string name="email_label">Email</string>
     <string name="logout_button">Выйти из аккаунта</string>
     <string name="save_changes">Сохранить</string>
+
+    <!-- Auth Errors -->
+    <string name="error_empty_fields">Заполните все поля</string>
+    <string name="error_invalid_email">Введите корректный email</string>
+    <string name="error_name_too_short">Имя должно содержать хотя бы 2 символа</string>
+    <string name="error_invalid_credentials">Неверный email или пароль</string>
+    <string name="error_email_taken">Этот email уже зарегистрирован</string>
+    <string name="error_bad_request">Проверьте введённые данные</string>
+    <string name="error_no_internet">Нет соединения с интернетом</string>
+    <string name="error_timeout">Превышено время ожидания ответа</string>
+    <string name="error_server">Сервер временно недоступен</string>
+    <string name="error_unknown">Что-то пошло не так. Попробуйте ещё раз</string>
 </resources>

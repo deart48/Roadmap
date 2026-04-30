@@ -22,6 +22,15 @@ class TokenManager(context: Context) {
     fun clearToken() {
         prefs.edit().remove(KEY_TOKEN).apply()
     }
+
+    fun clearUserId() {
+        prefs.edit().remove(KEY_USER_ID).apply()
+    }
+
+    /** Полная очистка данных сессии при выходе. */
+    fun clearSession() {
+        prefs.edit().remove(KEY_TOKEN).remove(KEY_USER_ID).apply()
+    }
     
     fun saveUserId(id: Long) {
         prefs.edit().putLong(KEY_USER_ID, id).apply()

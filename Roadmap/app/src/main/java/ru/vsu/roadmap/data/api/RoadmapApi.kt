@@ -28,6 +28,12 @@ interface RoadmapApi {
     @GET("roadmaps/{id}/steps")
     suspend fun getRoadmapSteps(@Header("Authorization") token: String, @Path("id") id: Long): List<RoadmapStepDto>
 
+    @GET("roadmaps/{id}/steps/progress")
+    suspend fun getStepProgress(
+        @Header("Authorization") token: String,
+        @Path("id") roadmapId: Long,
+    ): List<UserStepProgressDto>
+
     @GET("roadmaps/favorites")
     suspend fun getFavorites(@Header("Authorization") token: String): List<RoadmapDto>
 

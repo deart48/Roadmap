@@ -45,8 +45,9 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit = {},
     onLoginClick: () -> Unit = {}
 ) {
-    if (viewModel.isRegistered) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.isRegistered) {
+        if (viewModel.isRegistered) {
+            viewModel.consumeRegistered()
             onRegisterSuccess()
         }
     }
@@ -83,20 +84,13 @@ fun RegisterScreen(
         )
 
         Spacer(modifier = Modifier.height(48.dp))
-        
-        // Error Message
-        if (viewModel.error != null) {
-            Text(
-                text = viewModel.error!!,
-                color = Color.Red,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
+
+        ErrorBanner(message = viewModel.error)
 
         // Name Input
         OutlinedTextField(
             value = viewModel.name,
-            onValueChange = { viewModel.name = it },
+            onValueChange = { viewModel.onNameChange(it) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(text = stringResource(R.string.name_hint)) },
             leadingIcon = {
@@ -124,7 +118,7 @@ fun RegisterScreen(
         // Email Input
         OutlinedTextField(
             value = viewModel.email,
-            onValueChange = { viewModel.email = it },
+            onValueChange = { viewModel.onEmailChange(it) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(text = stringResource(R.string.email_hint)) },
             leadingIcon = {
@@ -153,7 +147,7 @@ fun RegisterScreen(
         // Password Input
         OutlinedTextField(
             value = viewModel.password,
-            onValueChange = { viewModel.password = it },
+            onValueChange = { viewModel.onPasswordChange(it) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(text = stringResource(R.string.password_hint)) },
             leadingIcon = {

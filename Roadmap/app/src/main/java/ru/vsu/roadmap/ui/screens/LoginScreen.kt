@@ -3,7 +3,6 @@ package ru.vsu.roadmap.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -52,8 +50,9 @@ fun LoginScreen(
     onForgotPasswordClick: () -> Unit = {},
     onCreateAccountClick: () -> Unit = {}
 ) {
-    if (viewModel.isLoggedIn) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.isLoggedIn) {
+        if (viewModel.isLoggedIn) {
+            viewModel.consumeLoggedIn()
             onLoginSuccess()
         }
     }
@@ -99,20 +98,13 @@ fun LoginScreen(
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-        
-        // Error Message
-        if (viewModel.error != null) {
-            Text(
-                text = viewModel.error!!,
-                color = Color.Red,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
+
+        ErrorBanner(message = viewModel.error)
 
         // Email Input
         OutlinedTextField(
             value = viewModel.email,
-            onValueChange = { viewModel.email = it },
+            onValueChange = { viewModel.onEmailChange(it) },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(text = stringResource(R.string.email_hint)) },
             leadingIcon = {
@@ -143,7 +135,7 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = viewModel.password,
-                onValueChange = { viewModel.password = it },
+                onValueChange = { viewModel.onPasswordChange(it) },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = stringResource(R.string.password_hint)) },
                 leadingIcon = {

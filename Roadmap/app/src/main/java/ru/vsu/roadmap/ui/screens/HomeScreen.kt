@@ -17,22 +17,14 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -43,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,15 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.vsu.roadmap.R
 import ru.vsu.roadmap.data.model.RoadmapDto
+import ru.vsu.roadmap.ui.components.RoadmapCircleBadge
 import ru.vsu.roadmap.ui.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        viewModel.loadData()
-    }
-
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onRoadmapOpened: () -> Unit = {},
+) {
     val suggestedRoadmaps = viewModel.roadmaps
     val favoriteRoadmaps = viewModel.favorites
 
@@ -87,16 +78,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     ),
                     textAlign = TextAlign.Center
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Placeholder Icon logic based on title or id
-                Icon(
-                    imageVector = if (selectedItem!!.id % 2 == 0L) Icons.Default.Settings else Icons.Default.Edit,
-                    contentDescription = null,
-                    modifier = Modifier.size(80.dp),
-                    tint = Color.Black
-                )
+                RoadmapCircleBadge(size = 80.dp)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -106,12 +91,34 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     textAlign = TextAlign.Center
                 )
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val steps = viewModel.currentSteps
+                if (steps.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.home_roadmap_steps_header),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                    steps.forEachIndexed { index, step ->
+                        Text(
+                            text = "${index + 1}. ${step.title}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.align(Alignment.Start).padding(vertical = 2.dp)
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(32.dp))
 
+                val item = selectedItem!!
+                val alreadyStarted = viewModel.startedRoadmapIds.contains(item.id)
                 Button(
                     onClick = {
-                        // TODO: Navigate to roadmap details or start it
-                        selectedItem = null
+                        viewModel.selectRoadmapForViewer(item.id) {
+                            selectedItem = null
+                            onRoadmapOpened()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -123,12 +130,16 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     shape = RoundedCornerShape(28.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.start_button),
+                        text = if (alreadyStarted) {
+                            stringResource(R.string.catalog_continue)
+                        } else {
+                            stringResource(R.string.catalog_start)
+                        },
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
@@ -198,7 +209,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
                 // Section 1 Items
                 items(suggestedRoadmaps) { item ->
-                    RoadmapCard(item, onClick = { selectedItem = item })
+                    RoadmapCard(item, onClick = {
+                        selectedItem = item
+                        viewModel.loadSteps(item.id)
+                    })
                 }
 
                 // Section 2 Title
@@ -217,7 +231,10 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
                     // Section 2 Items
                     items(favoriteRoadmaps) { item ->
-                        RoadmapCard(item, onClick = { selectedItem = item })
+                        RoadmapCard(item, onClick = {
+                            selectedItem = item
+                            viewModel.loadSteps(item.id)
+                        })
                     }
                 }
             }
@@ -255,13 +272,7 @@ fun RoadmapCard(item: RoadmapDto, onClick: () -> Unit) {
                 minLines = 2
             )
 
-            // Dynamic Icon based on ID/Content
-             Icon(
-                imageVector = if (item.id % 2 == 0L) Icons.Default.Settings else Icons.Default.Edit,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp),
-                tint = Color.Black
-            )
+            RoadmapCircleBadge(size = 48.dp)
 
             // Step count or description snippet
             Text(

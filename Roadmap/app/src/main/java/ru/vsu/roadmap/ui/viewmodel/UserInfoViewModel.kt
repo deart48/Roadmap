@@ -13,8 +13,7 @@ class UserInfoViewModel(private val userRepository: UserRepository) : ViewModel(
     var surname by mutableStateOf("")
     var dob by mutableStateOf("")
     var about by mutableStateOf("") // using this for position
-    var avatarUrl by mutableStateOf("")
-    
+
     var isLoading by mutableStateOf(false)
     var isSaved by mutableStateOf(false)
 

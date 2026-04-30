@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 
 object ApiClient {
     // Android Emulator localhost
-    private const val BASE_URL = "http://192.168.0.100:8080/"
+    private const val BASE_URL = "http://192.168.88.148:8080/"
 
     private val json = Json {
         ignoreUnknownKeys = true

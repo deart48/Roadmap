@@ -40,6 +40,18 @@ fun Route.roadmapRoutes(roadmapService: RoadmapService) {
                 val steps = roadmapService.getRoadmapSteps(id)
                 call.respond(steps)
             }
+
+            get("/{id}/steps/progress") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal!!.payload.getClaim("id").asLong()
+                val id = call.parameters["id"]?.toLongOrNull()
+                if (id == null) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val progress = roadmapService.getStepProgressForRoadmap(userId, id)
+                call.respond(progress)
+            }
             
             // Favorites
             get("/favorites") {
