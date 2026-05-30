@@ -229,8 +229,8 @@ fun HomeScreen(
                         )
                     }
 
-                    // Section 2 Items
-                    items(favoriteRoadmaps) { item ->
+                    // Section 2 Items (не более 4 плиток)
+                    items(favoriteRoadmaps.take(4)) { item ->
                         RoadmapCard(item, onClick = {
                             selectedItem = item
                             viewModel.loadSteps(item.id)
@@ -276,7 +276,7 @@ fun RoadmapCard(item: RoadmapDto, onClick: () -> Unit) {
 
             // Step count or description snippet
             Text(
-                text = "Tap to view", // Placeholder
+                text = stringResource(R.string.card_tap_to_view),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = Color.Black,
                     fontSize = 14.sp

@@ -125,24 +125,24 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Divider
-        Box(
-            modifier = Modifier
-                .width(40.dp)
-                .height(2.dp)
-                .background(Color.Black)
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Forgot Password
-        TextButton(onClick = onForgotPasswordClick) {
-            Text(
-                text = stringResource(R.string.forgot_password),
-                color = Color.Black,
-                fontSize = 16.sp
-            )
-        }
+//        // Divider
+//        Box(
+//            modifier = Modifier
+//                .width(40.dp)
+//                .height(2.dp)
+//                .background(Color.Black)
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // Forgot Password
+//        TextButton(onClick = onForgotPasswordClick) {
+//            Text(
+//                text = stringResource(R.string.forgot_password),
+//                color = Color.Black,
+//                fontSize = 16.sp
+//            )
+//        }
     }
 }
 

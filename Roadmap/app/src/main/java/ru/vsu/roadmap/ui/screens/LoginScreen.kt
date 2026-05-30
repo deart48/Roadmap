@@ -189,30 +189,31 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Bottom Links
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(onClick = onForgotPasswordClick) {
-                Text(
-                    text = stringResource(R.string.forgot_password),
-                    color = Color.Black,
-                    fontSize = 14.sp,
-                    textDecoration = TextDecoration.Underline
-                )
-            }
-
-            TextButton(onClick = onCreateAccountClick) {
-                Text(
-                    text = stringResource(R.string.create_account),
-                    color = Color.Black,
-                    fontSize = 14.sp,
-                    textDecoration = TextDecoration.Underline
-                )
-            }
+        TextButton(onClick = onCreateAccountClick) {
+            Text(
+                text = stringResource(R.string.create_account),
+                color = Color.Black,
+                fontSize = 14.sp,
+                textDecoration = TextDecoration.Underline
+            )
         }
+        // Bottom Links
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            TextButton(onClick = onForgotPasswordClick) {
+//                Text(
+//                    text = stringResource(R.string.forgot_password),
+//                    color = Color.Black,
+//                    fontSize = 14.sp,
+//                    textDecoration = TextDecoration.Underline
+//                )
+//            }
+
+
+//        }
     }
 }
 

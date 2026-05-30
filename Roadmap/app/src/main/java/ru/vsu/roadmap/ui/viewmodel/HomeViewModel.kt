@@ -59,6 +59,20 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Обновляет только список избранного (без перетасовки блока «Возможно вам подойдёт»).
+     * Вызывается при каждом возврате на главный экран, чтобы изменения из каталога/профиля
+     * сразу отражались здесь.
+     */
+    fun refreshFavorites() {
+        viewModelScope.launch {
+            val favoritesResult = roadmapRepository.getFavorites()
+            if (favoritesResult.isSuccess) {
+                favorites = favoritesResult.getOrDefault(emptyList())
+            }
+        }
+    }
+
     fun loadSteps(roadmapId: Long) {
         viewModelScope.launch {
             currentSteps = emptyList()

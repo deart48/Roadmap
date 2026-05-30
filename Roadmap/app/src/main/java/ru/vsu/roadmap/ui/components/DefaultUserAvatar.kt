@@ -14,7 +14,7 @@ fun DefaultUserAvatar(
     contentDescription: String? = null,
 ) {
     Image(
-        painter = painterResource(R.drawable.avatar),
+        painter = painterResource(R.drawable.avatar2),
         contentDescription = contentDescription,
         modifier = modifier,
         contentScale = ContentScale.Crop,

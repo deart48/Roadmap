@@ -71,6 +71,13 @@ fun NavMenu(
             ) {
                 composable(BottomRoutes.HOME) {
                     val homeViewModel: HomeViewModel = viewModel(factory = viewModelFactory)
+                    val navEntry by navController.currentBackStackEntryAsState()
+                    val route = navEntry?.destination?.route
+                    LaunchedEffect(route) {
+                        if (route == BottomRoutes.HOME) {
+                            homeViewModel.refreshFavorites()
+                        }
+                    }
                     HomeScreen(
                         viewModel = homeViewModel,
                         onRoadmapOpened = {

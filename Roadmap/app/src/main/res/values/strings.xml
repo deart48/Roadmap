@@ -26,6 +26,7 @@
     <string name="suggested_roadmaps">Возможно вам подойдет</string>
     <string name="favorite_roadmaps">Избранные дорожные карты</string>
     <string name="home_roadmap_steps_header">Этапы:</string>
+    <string name="card_tap_to_view">Нажмите, чтобы открыть</string>
     <string name="profile_roadmap_progress_hint">Текущий прогресс: %1$d%%</string>
     
     <!-- Card Titles -->

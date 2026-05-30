@@ -3,6 +3,8 @@ package ru.vsu.roadmap.ui.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,9 +60,9 @@ fun ProfileScreen(
     onSettingsClick: () -> Unit = {},
     onRoadmapOpened: () -> Unit = {},
 ) {
-    // Reload data every time the screen is displayed
+    // Лёгкое обновление при каждом показе экрана (без спиннера и сброса контента)
     androidx.compose.runtime.LaunchedEffect(Unit) {
-        viewModel.loadData()
+        viewModel.refresh()
     }
 
     val profile = viewModel.profile
@@ -171,6 +173,7 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -328,43 +331,50 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Display up to 2 favorites
-                Row(
+                // Все избранные карты, по 2 в ряд
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    viewModel.favorites.take(2).forEach { fav ->
-                        Card(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(80.dp)
-                                .clickable {
-                                    selectedRoadmap = fav
-                                    viewModel.loadSteps(fav.id)
-                                },
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(2.dp, Color.Black),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                    viewModel.favorites.chunked(2).forEach { rowFavorites ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = fav.title,
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontWeight = FontWeight.Medium,
-                                        color = Color.Black
-                                    ),
-                                    maxLines = 2
-                                )
+                            rowFavorites.forEach { fav ->
+                                Card(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(80.dp)
+                                        .clickable {
+                                            selectedRoadmap = fav
+                                            viewModel.loadSteps(fav.id)
+                                        },
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(2.dp, Color.Black),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                                ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = fav.title,
+                                            textAlign = TextAlign.Center,
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                fontWeight = FontWeight.Medium,
+                                                color = Color.Black
+                                            ),
+                                            maxLines = 2
+                                        )
+                                    }
+                                }
+                            }
+                            // Если в ряду одна карта — добавляем пустое место для выравнивания
+                            if (rowFavorites.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
-                    }
-                    // If only 1 favorite, add a spacer to keep alignment
-                    if (viewModel.favorites.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }

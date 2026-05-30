@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ru.vsu.roadmap.data.model.RoadmapDto
 import ru.vsu.roadmap.data.model.RoadmapStepDto
@@ -40,40 +41,54 @@ class ProfileViewModel(
         viewModelScope.launch {
             isLoading = true
             error = null
+            fetchData()
+            isLoading = false
+        }
+    }
 
-            val profileDeferred = async { userRepository.getProfile() }
-            val favoritesDeferred = async { roadmapRepository.getFavorites() }
-            val progressDeferred = async { roadmapRepository.getAllUserProgress() }
+    /**
+     * Лёгкое обновление: перечитывает данные без спиннера и без сброса уже показанного контента.
+     * Вызывается при каждом возврате на экран профиля.
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            fetchData()
+        }
+    }
 
-            val profileResult = profileDeferred.await()
-            val favoritesResult = favoritesDeferred.await()
-            val progressResult = progressDeferred.await()
+    private suspend fun fetchData() = coroutineScope {
+        val profileDeferred = async { userRepository.getProfile() }
+        val favoritesDeferred = async { roadmapRepository.getFavorites() }
+        val progressDeferred = async { roadmapRepository.getAllUserProgress() }
 
-            if (profileResult.isSuccess) {
-                profile = profileResult.getOrNull()
-            }
+        val profileResult = profileDeferred.await()
+        val favoritesResult = favoritesDeferred.await()
+        val progressResult = progressDeferred.await()
 
-            if (favoritesResult.isSuccess) {
-                favorites = favoritesResult.getOrDefault(emptyList())
-            }
+        if (profileResult.isSuccess) {
+            profile = profileResult.getOrNull()
+        }
 
-            if (progressResult.isSuccess) {
-                val allProgress = progressResult.getOrDefault(emptyList())
-                startedRoadmapIds = allProgress.map { it.roadmapId }.toSet()
-                val latest = allProgress.firstOrNull()
-                activeProgress = latest
+        if (favoritesResult.isSuccess) {
+            favorites = favoritesResult.getOrDefault(emptyList())
+        }
 
-                if (latest != null) {
-                    val roadmapResult = roadmapRepository.getRoadmapById(latest.roadmapId)
-                    if (roadmapResult.isSuccess) {
-                        activeRoadmap = roadmapResult.getOrNull()
-                    }
+        if (progressResult.isSuccess) {
+            val allProgress = progressResult.getOrDefault(emptyList())
+            startedRoadmapIds = allProgress.map { it.roadmapId }.toSet()
+            val latest = allProgress.firstOrNull()
+            activeProgress = latest
+
+            if (latest != null) {
+                val roadmapResult = roadmapRepository.getRoadmapById(latest.roadmapId)
+                if (roadmapResult.isSuccess) {
+                    activeRoadmap = roadmapResult.getOrNull()
                 }
             } else {
-                if (profileResult.isFailure) error = profileResult.exceptionOrNull()?.message
+                activeRoadmap = null
             }
-
-            isLoading = false
+        } else {
+            if (profileResult.isFailure) error = profileResult.exceptionOrNull()?.message
         }
     }
 
